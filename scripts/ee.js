@@ -5,7 +5,7 @@
  */
 
 var isOneTouch = false;
-var control = 3;
+var control = 0;
 var controlTypes = ["arrows", "drag", "target", "arrowsClick", "arrowsHover"];
 
 
@@ -142,23 +142,14 @@ function createEE() {
         }
     }
     else if (controlTypes[control] === "arrowsClick") {
+      // no case for OneTouch at the moment
       createSixArrows();
-      if (isOneTouch) {
-        arrowRight.setAttribute("onclick", "startDrag(evt, RIGHT)");
-        arrowLeft.setAttribute("onclick", "startDrag(evt, LEFT)");
-        arrowUp.setAttribute("onclick", "startDrag(evt, UP)");
-        arrowDown.setAttribute("onclick", "startDrag(evt, DOWN)");
-        arrowCW.setAttribute("onclick", "startDrag(evt,CW)");
-        arrowCCW.setAttribute("onclick", "startDrag(evt,CCW)");
-      }
-      else {
-        arrowRight.setAttribute("onmousedown", "startDrag(evt, RIGHT)");
-        arrowLeft.setAttribute("onmousedown", "startDrag(evt, LEFT)");
-        arrowUp.setAttribute("onmousedown", "startDrag(evt, UP)");
-        arrowDown.setAttribute("onmousedown", "startDrag(evt, DOWN)");
-        arrowCW.setAttribute("onmousedown", "startDrag(evt,CW)");
-        arrowCCW.setAttribute("onmousedown", "startDrag(evt,CCW)");
-      }
+      arrowRight.setAttribute("onmousedown", "startDrag(evt, RIGHT)");
+      arrowLeft.setAttribute("onmousedown", "startDrag(evt, LEFT)");
+      arrowUp.setAttribute("onmousedown", "startDrag(evt, UP)");
+      arrowDown.setAttribute("onmousedown", "startDrag(evt, DOWN)");
+      arrowCW.setAttribute("onmousedown", "startRotate2(evt,CW)");
+      arrowCCW.setAttribute("onmousedown", "startRotate2(evt,CCW)");
     }
     else if (controlTypes[control] === "arrowsHover") {
       // no case for OneTouch
@@ -563,6 +554,21 @@ function startRotate(evt) {
     ring.style.stroke = "#99E";
 }
 
+function startRotate2(evt, direction) {
+    isRotating = true;
+    startPos = pos;
+    startRot = rot;
+    var ws = document.getElementById("workspace");
+    ws.setAttributeNS(null, "onmousedown", "rotate(evt, "+ direction +")");
+    if(direction == CW){
+      evt.target.style.fill = "#bf42f4"
+    }
+    else if(direction == CCW){
+      evt.target.style.fill = "#4cef23"
+    }
+    ws.setAttributeNS(null, "onmouseup", "stopRotate2(evt)");
+}
+
 function drag(evt, direction) {
     var ws = document.getElementById("workspace");
     var rect = ws.getBoundingClientRect();
@@ -609,12 +615,24 @@ function checkGoal(currPoseX, currPoseY, goalPoseX, goalPoseY, currRot, goalRot)
 
 }
 
-function rotate(evt) {
-    var ws = document.getElementById("workspace");
-    var rect = ws.getBoundingClientRect();
-    var mouseX = evt.clientX - rect.left;
-    var mouseY = evt.clientY - rect.top;
-    var newPoint = [mouseX, mouseY];
+function rotate(evt, direction) {
+    var newPoint = [0,0];
+    var delta = 5;
+    if(direction == undefined){
+      var ws = document.getElementById("workspace");
+      var rect = ws.getBoundingClientRect();
+      var mouseX = evt.clientX - rect.left;
+      var mouseY = evt.clientY - rect.top;
+      newPoint = [mouseX, mouseY];
+    }
+    else if(direction == CW){
+      newPoint = [pos[0] + delta, pos[1] + delta];
+      refPos = pos;
+    }
+    else if(direction == CCW){
+      newPoint = [pos[0] + delta, pos[1] - delta];
+      refPos = pos;
+    }
     var centerPoint = pos;
     var a = diff(newPoint, refPos);
     var aUnit = [a[0]/length(a),a[1]/length(a)];
@@ -683,8 +701,6 @@ function stopDrag(evt, direction) {
             arrowLeft.style.fill = "#181acc";
             arrowUp.style.fill = "#cc070e";
             arrowDown.style.fill = "#cc070e";
-            arrowCW.style.fill = "#a442f4";
-            arrowCCW.style.fill = "#36bc3d";
         }
 
         if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
@@ -705,9 +721,25 @@ function stopRotate(evt, direction) {
         else
             ws.removeAttributeNS(null, "onmouseup");
         isRotating = false;
+        arrowCW.style.fill = "#a442f4";
+        arrowCCW.style.fill = "#36bc3d";
         ring.style.stroke = "#AAC";
         if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
             success();
+        }
+    }
+}
+
+function stopRotate2(evt, direction) {
+    if (isRotating) {
+        var ws = document.getElementById("workspace");
+        ws.removeAttributeNS(null, "onmousedown");
+        ws.removeAttributeNS(null, "onmouseup");
+        isRotating = false;
+        arrowCW.style.fill = "#a442f4";
+        arrowCCW.style.fill = "#36bc3d";
+        if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
+          success();
         }
     }
 }
