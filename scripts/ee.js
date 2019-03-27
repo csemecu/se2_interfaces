@@ -6,7 +6,7 @@
 
 var isOneTouch = false;
 var control = 3;
-var controlTypes = ["arrows", "drag", "target", "arrowsClick"];
+var controlTypes = ["arrows", "drag", "target", "arrowsClick", "arrowsHover"];
 
 
 var ee = null;
@@ -142,32 +142,42 @@ function createEE() {
         }
     }
     else if (controlTypes[control] === "arrowsClick") {
-        createSixArrows();
-        if (isOneTouch) {
-            arrowRight.setAttribute("onclick", "startDrag(evt, RIGHT)");
-            arrowLeft.setAttribute("onclick", "startDrag(evt, LEFT)");
-            arrowUp.setAttribute("onclick", "startDrag(evt, UP)");
-            arrowDown.setAttribute("onclick", "startDrag(evt, DOWN)");
-            arrowCW.setAttribute("onclick", "startDrag(evt,CW)");
-            arrowCCW.setAttribute("onclick", "startDrag(evt,CCW)");
-        }
-        else {
-            arrowRight.setAttribute("onmousedown", "startDrag(evt, RIGHT)");
-            arrowLeft.setAttribute("onmousedown", "startDrag(evt, LEFT)");
-            arrowUp.setAttribute("onmousedown", "startDrag(evt, UP)");
-            arrowDown.setAttribute("onmousedown", "startDrag(evt, DOWN)");
-            arrowCW.setAttribute("onmousedown", "startDrag(evt,CW)");
-            arrowCCW.setAttribute("onmousedown", "startDrag(evt,CCW)");
-        }
+      createSixArrows();
+      if (isOneTouch) {
+        arrowRight.setAttribute("onclick", "startDrag(evt, RIGHT)");
+        arrowLeft.setAttribute("onclick", "startDrag(evt, LEFT)");
+        arrowUp.setAttribute("onclick", "startDrag(evt, UP)");
+        arrowDown.setAttribute("onclick", "startDrag(evt, DOWN)");
+        arrowCW.setAttribute("onclick", "startDrag(evt,CW)");
+        arrowCCW.setAttribute("onclick", "startDrag(evt,CCW)");
+      }
+      else {
+        arrowRight.setAttribute("onmousedown", "startDrag(evt, RIGHT)");
+        arrowLeft.setAttribute("onmousedown", "startDrag(evt, LEFT)");
+        arrowUp.setAttribute("onmousedown", "startDrag(evt, UP)");
+        arrowDown.setAttribute("onmousedown", "startDrag(evt, DOWN)");
+        arrowCW.setAttribute("onmousedown", "startDrag(evt,CW)");
+        arrowCCW.setAttribute("onmousedown", "startDrag(evt,CCW)");
+      }
+    }
+    else if (controlTypes[control] === "arrowsHover") {
+      // no case for OneTouch
+      createSixArrows();
+      arrowRight.setAttribute("onmouseover", "startDrag(evt, RIGHT)");
+      arrowLeft.setAttribute("onmouseover", "startDrag(evt, LEFT)");
+      arrowUp.setAttribute("onmouseover", "startDrag(evt, UP)");
+      arrowDown.setAttribute("onmouseover", "startDrag(evt, DOWN)");
+      arrowCW.setAttribute("onmouseover", "startDrag(evt,CW)");
+      arrowCCW.setAttribute("onmouseover", "startDrag(evt,CCW)");
     }
     else if (controlTypes[control] === "target") {
-        createGhost();
-        if(isOneTouch) {
-            ws.setAttribute("onclick", "startGhost(evt)");
-        }
-        else {
-            ws.setAttribute("onmousedown", "startGhost(evt)");
-        }
+      createGhost();
+      if(isOneTouch) {
+          ws.setAttribute("onclick", "startGhost(evt)");
+      }
+      else {
+          ws.setAttribute("onmousedown", "startGhost(evt)");
+      }
     }
 
     else {
@@ -494,7 +504,7 @@ function startDrag(evt, direction) {
           ws.setAttributeNS(null, "onmousedown", "drag(evt, " + direction + ")");
         }
         if(controlTypes[control] == "arrowsHover"){
-          ws.setAttributeNS(null, "onmouseover", "drag(evt, " + direction + "");
+          ws.setAttributeNS(null, "onmouseover", "drag(evt, " + direction + ")");
         }
         else{
           ws.setAttributeNS(null, "onmousemove", "drag(evt, " + direction + ")");
@@ -518,9 +528,15 @@ function startDrag(evt, direction) {
             ws.setAttribute("onclick", "stopDrag(evt, " + direction + ")");
             evt.stopPropagation();
         }
-        else
+        else{
+          if(controlTypes[control] == "arrowsClick"){
             ws.setAttributeNS(null, "onmouseup", "stopDrag(evt, " + direction + ")");
-
+          }
+          if(controlTypes[control] == "arrowsHover"){
+            ws.setAttributeNS(null, "onmouseout", "stopDrag(evt, " + direction + ")");
+          }
+          ws.setAttributeNS(null, "onmouseup", "stopDrag(evt, " + direction + ")");
+        }
     }
 
 }
@@ -554,7 +570,7 @@ function drag(evt, direction) {
     var mouseY = evt.clientY - rect.top;
     var newPoint = [mouseX, mouseY];
     var a = diff(newPoint, refPos);
-    if(controlTypes[control] === "arrowsClick"){
+    if(controlTypes[control] == "arrowsClick" || controlTypes[control] == "arrowsHover"){
       // Here we want to get the current position of the triangle and add a delta of motion
       // I considered making this delta inversely proportional to the distance to the goal. For example, 10px for far away, 5px increment when mid-range, 1px for when you are close (within 5px?)
       var delta = 3;
