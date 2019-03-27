@@ -559,7 +559,7 @@ function startRotate2(evt, direction) {
     startPos = pos;
     startRot = rot;
     var ws = document.getElementById("workspace");
-    ws.setAttributeNS(null, "onmousedown", "rotate(evt, "+ direction +")");
+    ws.setAttributeNS(null, "onclick", "rotate(evt, "+ direction +")");
     if(direction == CW){
       evt.target.style.fill = "#bf42f4"
     }
@@ -587,8 +587,6 @@ function drag(evt, direction) {
       a = [delta,delta];
       }
     }
-    console.log(pos);
-
     if(direction == undefined) {
         pos = [startPos[0] + a[0], startPos[1] + a[1]];
     }
@@ -626,12 +624,12 @@ function rotate(evt, direction) {
       newPoint = [mouseX, mouseY];
     }
     else if(direction == CW){
-      newPoint = [pos[0] + delta, pos[1] + delta];
-      refPos = pos;
+      newPoint = [pos[0] + 2*delta, pos[1] - delta];
+      refPos = [pos[0] + 1, pos[1] - 1];
     }
     else if(direction == CCW){
-      newPoint = [pos[0] + delta, pos[1] - delta];
-      refPos = pos;
+      newPoint = [pos[0] + 2*delta, pos[1] + delta];
+      refPos = [pos[0] + 1, pos[1] + 1];
     }
     var centerPoint = pos;
     var a = diff(newPoint, refPos);
@@ -645,7 +643,8 @@ function rotate(evt, direction) {
     var alpha2 = Math.asin((length(a)-dist)/length(c));
     var alpha = alphaSign*(alpha1+alpha2);
     var alphaDeg = Math.round(180.0*alpha/Math.PI);
-
+    /*console.log("alpha " + alpha + "\nalpha1 " + alpha1 + "\nalpha2 " + alpha2 + "\na " + a );
+    console.log("New Point " + newPoint + "\nrefPos " + refPos + "\ncenterPoint " + centerPoint);*/
     if (!isNaN(alpha)) {
         rot = startRot + alphaDeg;
 
@@ -653,7 +652,7 @@ function rotate(evt, direction) {
             rot -= 360;
         if (rot < -180)
             rot += 360;
-
+        console.log(rot);
         resetPose();
     }
 }
