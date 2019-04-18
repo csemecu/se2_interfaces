@@ -615,7 +615,7 @@ function checkGoal(currPoseX, currPoseY, goalPoseX, goalPoseY, currRot, goalRot)
 
 function rotate(evt, direction) {
     var newPoint = [0,0];
-    var delta = 5;
+    var delta = 3;
     if(direction == undefined){
       var ws = document.getElementById("workspace");
       var rect = ws.getBoundingClientRect();
@@ -631,6 +631,7 @@ function rotate(evt, direction) {
       newPoint = [pos[0] + 2*delta, pos[1] + delta];
       refPos = [pos[0] + 1, pos[1] + 1];
     }
+    // This was the original rotate method with the undefined direction part
     var centerPoint = pos;
     var a = diff(newPoint, refPos);
     var aUnit = [a[0]/length(a),a[1]/length(a)];
@@ -643,8 +644,6 @@ function rotate(evt, direction) {
     var alpha2 = Math.asin((length(a)-dist)/length(c));
     var alpha = alphaSign*(alpha1+alpha2);
     var alphaDeg = Math.round(180.0*alpha/Math.PI);
-    /*console.log("alpha " + alpha + "\nalpha1 " + alpha1 + "\nalpha2 " + alpha2 + "\na " + a );
-    console.log("New Point " + newPoint + "\nrefPos " + refPos + "\ncenterPoint " + centerPoint);*/
     if (!isNaN(alpha)) {
         rot = startRot + alphaDeg;
 
