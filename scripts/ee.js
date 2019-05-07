@@ -447,12 +447,22 @@ function startDrag(evt, direction) {
         }
         if(controlTypes[control] == "arrowsClick"){
             console.log("curiosity, ",evt);
-            ws.setAttributeNS(null, "onmousedown", "move2(evt, " + direction + ")");
+            ws.setAttributeNS(null, "onmousedown", "move2(" + direction + ")");
             ws.setAttributeNS(null, "onmouseup", "stopDrag(evt, " + direction + ")");
         }
         if(controlTypes[control] == "arrowsHover"){
-            ws.setAttributeNS(null, "onmouseover", "move2(evt, " + direction + ")");
-            ws.setAttributeNS(null, "onmouseout", "stopDrag(evt, " + direction + ")");
+            let hover = true;
+            const move = window.setInterval(function() {
+                if(hover) {
+                    console.log("pos = " + pos);
+                    move2(direction);
+                    startPos = pos;
+                }
+            }, 50);
+            evt.target.addEventListener("mouseout", function() {
+                hover = false; 
+            });
+
             evt.stopPropagation();
         }
         if(direction == LEFT || direction == RIGHT){
@@ -502,7 +512,7 @@ function startRotate2(evt, direction) {
     //ws.setAttributeNS(null, "onmouseup", "stopRotate2(evt)");
 }
 
-function move2(evt, direction){
+function move2(direction){
     var ws = document.getElementById("workspace");
     var a = 0;
     var delta = 1;
@@ -522,7 +532,6 @@ function move2(evt, direction){
         console.error("Bad direction");
     }
 
-    console.log("moved");
     resetPose();
 }
 
