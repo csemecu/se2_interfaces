@@ -4,7 +4,6 @@
  * Represented by a triangle.
  */
 
-var isOneTouch = false;
 var control = 0;
 var controlTypes = ["arrows", "drag", "target", "arrowsClick", "arrowsHover"];
 
@@ -17,7 +16,7 @@ var score = 0;
 
 var isTranslating = false;
 var isRotating = false;
-var refPos = null;
+var refPos = [0,0];
 var startRot = null;
 var startPos = null;
 
@@ -119,58 +118,39 @@ function createEE() {
     arrowsSix = null;
 
     if (controlTypes[control] === "drag") {
-        if (isOneTouch)
-            ee.setAttributeNS(null, "onclick", "startDrag(evt)");
-        else
-            ee.setAttributeNS(null, "onmousedown", "startDrag(evt)");
+        ee.setAttributeNS(null, "onmousedown", "startDrag(evt)");
         createRing();
     }
     else if (controlTypes[control] === "arrows") {
         createRing();
         createArrows();
-        if (isOneTouch) {
-            arrowRight.setAttribute("onclick", "startDrag(evt, RIGHT)");
-            arrowLeft.setAttribute("onclick", "startDrag(evt, LEFT)");
-            arrowUp.setAttribute("onclick", "startDrag(evt, UP)");
-            arrowDown.setAttribute("onclick", "startDrag(evt, DOWN)");
-        }
-        else {
-            arrowRight.setAttribute("onmousedown", "startDrag(evt, RIGHT)");
-            arrowLeft.setAttribute("onmousedown", "startDrag(evt, LEFT)");
-            arrowUp.setAttribute("onmousedown", "startDrag(evt, UP)");
-            arrowDown.setAttribute("onmousedown", "startDrag(evt, DOWN)");
-        }
-    }
-    else if (controlTypes[control] === "arrowsClick") {
-      // no case for OneTouch at the moment
-      createSixArrows();
-      arrowRight.setAttribute("onmousedown", "startDrag(evt, RIGHT)");
-      arrowLeft.setAttribute("onmousedown", "startDrag(evt, LEFT)");
-      arrowUp.setAttribute("onmousedown", "startDrag(evt, UP)");
-      arrowDown.setAttribute("onmousedown", "startDrag(evt, DOWN)");
-      arrowCW.setAttribute("onmousedown", "startRotate2(evt,CW)");
-      arrowCCW.setAttribute("onmousedown", "startRotate2(evt,CCW)");
-    }
-    else if (controlTypes[control] === "arrowsHover") {
-      // no case for OneTouch
-      createSixArrows();
-      arrowRight.setAttribute("onmouseover", "startDrag(evt, RIGHT)");
-      arrowLeft.setAttribute("onmouseover", "startDrag(evt, LEFT)");
-      arrowUp.setAttribute("onmouseover", "startDrag(evt, UP)");
-      arrowDown.setAttribute("onmouseover", "startDrag(evt, DOWN)");
-      arrowCW.setAttribute("onmouseover", "startDrag(evt,CW)");
-      arrowCCW.setAttribute("onmouseover", "startDrag(evt,CCW)");
+        arrowRight.setAttribute("onmousedown", "startDrag(evt, RIGHT)");
+        arrowLeft.setAttribute("onmousedown", "startDrag(evt, LEFT)");
+        arrowUp.setAttribute("onmousedown", "startDrag(evt, UP)");
+        arrowDown.setAttribute("onmousedown", "startDrag(evt, DOWN)");
     }
     else if (controlTypes[control] === "target") {
       createGhost();
-      if(isOneTouch) {
-          ws.setAttribute("onclick", "startGhost(evt)");
-      }
-      else {
-          ws.setAttribute("onmousedown", "startGhost(evt)");
-      }
+      ws.setAttribute("onmousedown", "startGhost(evt)");
     }
-
+    else if (controlTypes[control] === "arrowsClick") {
+        createSixArrows();
+        arrowRight.setAttribute("onmousedown", "startDrag(evt, RIGHT)");
+        arrowLeft.setAttribute("onmousedown", "startDrag(evt, LEFT)");
+        arrowUp.setAttribute("onmousedown", "startDrag(evt, UP)");
+        arrowDown.setAttribute("onmousedown", "startDrag(evt, DOWN)");
+        arrowCW.setAttribute("onmousedown", "startRotate2(evt,CW)");
+        arrowCCW.setAttribute("onmousedown", "startRotate2(evt,CCW)");
+    }
+    else if (controlTypes[control] === "arrowsHover") {
+        createSixArrows();
+        arrowRight.setAttribute("onmouseover", "startDrag(evt, RIGHT)");
+        arrowLeft.setAttribute("onmouseover", "startDrag(evt, LEFT)");
+        arrowUp.setAttribute("onmouseover", "startDrag(evt, UP)");
+        arrowDown.setAttribute("onmouseover", "startDrag(evt, DOWN)");
+        arrowCW.setAttribute("onmouseover", "startRotate2(evt,CW)");
+        arrowCCW.setAttribute("onmouseover", "startRotate2(evt,CCW)");
+    }
     else {
         console.error("Please select a valid control");
     }
@@ -260,10 +240,7 @@ function createRing() {
     ring.style.stroke = "#AAC";
     ring.setAttribute("class", "draggable");
     ring.setAttribute("stroke-dasharray", "30, 0.3");
-    if (isOneTouch)
-        ring.setAttributeNS(null, "onclick", "startRotate(evt)");
-    else
-        ring.setAttributeNS(null, "onmousedown", "startRotate(evt)");
+    ring.setAttributeNS(null, "onmousedown", "startRotate(evt)");
     ws.appendChild(ring);
 }
 
@@ -359,12 +336,7 @@ function startGhost(evt) {
     targetFixedX = evt.offsetX;
     targetFixedY = evt.offsetY;
     ws.setAttribute("onmousemove", "drawGhost(evt)");
-    if (isOneTouch) {
-        ws.setAttribute("onclick", "targetMoveEE(evt)");
-    }
-    else {
-        ws.setAttribute("onmouseup", "targetMoveEE(evt)");
-    }
+    ws.setAttribute("onmouseup", "targetMoveEE(evt)");
 }
 
 
@@ -413,11 +385,6 @@ function targetMoveEE(evt) {
     if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
         success();
     }
-
-
-    if (isOneTouch)
-        ws.setAttribute("onclick", "startGhost(evt)");
-
 }
 
 function resetPose() {
@@ -437,7 +404,7 @@ function resetPose() {
         moveObjectAndScale(arrowDown, pos[0] + arrowDownXOffset, pos[1] + arrowDownYOffset, 90, scale);
     }
     if(arrowsSix){
-      var center = [105,105];
+      var center = [105,105];  // TO-DO this should be placed in a different element, not inside "workspace"
       moveObjectAndScale(arrowRight, center[0] + arrowRightXOffset, center[1] + arrowRightYOffset, 0, scale);
       moveObjectAndScale(arrowLeft, center[0] + arrowLeftXOffset, center[1] + arrowLeftYOffset, 180, scale);
       moveObjectAndScale(arrowUp, center[0] + arrowUpXOffset, center[1] + arrowUpYOffset, -90, scale);
@@ -445,19 +412,6 @@ function resetPose() {
       arrowCCW.setAttribute("transform", "translate(" + (center[0] + arrowCCWXOffset) + " " + (center[1] + arrowCCWYOffset) + ") rotate(" + (135) + " " + 0 + " " + 0 + ") scale(" + scale + ")" );
       arrowCW.setAttribute("transform", "translate(" + (center[0] + arrowCWXOffset) + " " + (center[1] + arrowCWYOffset) +") rotate(" + (45) + " " + 0 + " " + 0 + ") scale(" + scale + ")" );
     }
-    /*
-    if(trajArrows){
-        trajArrows.forEach(function (arrow) {
-            moveObject(arrow, pos[0], pos[1], 0);
-
-        });
-    }
-
-    if(trajNums){
-        trajNums.forEach(function (num) {
-            moveObject(num, pos[0], pos[1], 0);
-        });
-    }*/
 
     if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
         target.style.stroke = targetGreen;
@@ -482,51 +436,30 @@ function startDrag(evt, direction) {
     // this is for controlType = "drag"
     if (direction == undefined ) {
         ws.setAttributeNS(null, "onmousemove", "drag(evt)");
-
-        if (isOneTouch)
-            ee.setAttributeNS(null, "onclick", "stopDrag(evt)");
-        else
-            ws.setAttributeNS(null, "onmouseup", "stopDrag(evt)");
+        ws.setAttributeNS(null, "onmouseup", "stopDrag(evt)");
         ee.style.fill = "#9EE";
     }
     // This is for controlTypes involving arrows
     else {
+        if(controlTypes[control] == "arrows"){
+            ws.setAttributeNS(null, "onmousemove", "drag(evt, " + direction + ")");
+            ws.setAttributeNS(null, "onmouseup", "stopDrag(evt, " + direction + ")");
+        }
         if(controlTypes[control] == "arrowsClick"){
-          ws.setAttributeNS(null, "onmousedown", "drag(evt, " + direction + ")");
+            console.log("curiosity, ",evt);
+            ws.setAttributeNS(null, "onmousedown", "move2(evt, " + direction + ")");
+            ws.setAttributeNS(null, "onmouseup", "stopDrag(evt, " + direction + ")");
         }
         if(controlTypes[control] == "arrowsHover"){
-          ws.setAttributeNS(null, "onmouseover", "drag(evt, " + direction + ")");
-        }
-        else{
-          ws.setAttributeNS(null, "onmousemove", "drag(evt, " + direction + ")");
-        }
-        if(direction == LEFT || direction == RIGHT){
-          evt.target.style.fill = "#4a4aff"
-        }
-        else if(direction == UP || direction == DOWN){
-          evt.target.style.fill = "#ff070e"
-        }
-        else if(direction == CW){
-          evt.target.style.fill = "#bf42f4"
-        }
-        else if(direction == CCW){
-          evt.target.style.fill = "#4cef23"
-        }
-        if (isOneTouch) {
-            arrows.forEach(function(arrow) {
-               arrow.setAttributeNS(null, "onclick", "stopDrag(evt, " + direction + ")");
-            });
-            ws.setAttribute("onclick", "stopDrag(evt, " + direction + ")");
+            ws.setAttributeNS(null, "onmouseover", "move2(evt, " + direction + ")");
+            ws.setAttributeNS(null, "onmouseout", "stopDrag(evt, " + direction + ")");
             evt.stopPropagation();
         }
-        else{
-          if(controlTypes[control] == "arrowsClick"){
-            ws.setAttributeNS(null, "onmouseup", "stopDrag(evt, " + direction + ")");
-          }
-          if(controlTypes[control] == "arrowsHover"){
-            ws.setAttributeNS(null, "onmouseout", "stopDrag(evt, " + direction + ")");
-          }
-          ws.setAttributeNS(null, "onmouseup", "stopDrag(evt, " + direction + ")");
+        if(direction == LEFT || direction == RIGHT){
+            evt.target.style.fill = "#4a4aff"
+        }
+        else if(direction == UP || direction == DOWN){
+            evt.target.style.fill = "#ff070e"
         }
     }
 
@@ -543,14 +476,7 @@ function startRotate(evt) {
     startRot = rot;
     var ws = document.getElementById("workspace");
     ws.setAttributeNS(null, "onmousemove", "rotate(evt)");
-
-    if (isOneTouch) {
-        ring.setAttributeNS(null, "onclick", "stopRotate(evt)");
-        ws.setAttribute("onclick","stopRotate(evt)");
-        evt.stopPropagation();
-    }
-    else
-        ws.setAttributeNS(null, "onmouseup", "stopRotate(evt)");
+    ws.setAttributeNS(null, "onmouseup", "stopRotate(evt)");
     ring.style.stroke = "#99E";
 }
 
@@ -559,14 +485,45 @@ function startRotate2(evt, direction) {
     startPos = pos;
     startRot = rot;
     var ws = document.getElementById("workspace");
-    ws.setAttributeNS(null, "onclick", "rotate(evt, "+ direction +")");
+    if(controlTypes[control] == "arrowsClick"){
+        ws.setAttributeNS(null, "onmousedown", "rotate(evt, " + direction + ")");
+        ws.setAttributeNS(null, "onmouseup", "stopRotate2(evt, " + direction + ")");
+    }
+    if(controlTypes[control] == "arrowsHover"){
+        ws.setAttributeNS(null, "onmouseover", "rotate(evt, " + direction + ")");
+        ws.setAttributeNS(null, "onmouseout", "stopRotate2(evt, " + direction + ")");
+    }
     if(direction == CW){
-      evt.target.style.fill = "#bf42f4"
+        evt.target.style.fill = "#bf42f4"
     }
     else if(direction == CCW){
-      evt.target.style.fill = "#4cef23"
+        evt.target.style.fill = "#4cef23"
     }
-    ws.setAttributeNS(null, "onmouseup", "stopRotate2(evt)");
+    //ws.setAttributeNS(null, "onmouseup", "stopRotate2(evt)");
+}
+
+function move2(evt, direction){
+    var ws = document.getElementById("workspace");
+    var a = 0;
+    var delta = 1;
+    if(direction == LEFT || direction == UP){
+        a = [-delta,-delta];
+    }
+    else{
+        a = [delta,delta];
+    }
+    if(direction == RIGHT || direction == LEFT){
+        pos = [startPos[0] + a[0], startPos[1]];
+    }
+    else if(direction == UP || direction == DOWN){
+        pos = [startPos[0], startPos[1] + a[1]];
+    }
+    else {
+        console.error("Bad direction");
+    }
+
+    console.log("moved");
+    resetPose();
 }
 
 function drag(evt, direction) {
@@ -576,17 +533,7 @@ function drag(evt, direction) {
     var mouseY = evt.clientY - rect.top;
     var newPoint = [mouseX, mouseY];
     var a = diff(newPoint, refPos);
-    if(controlTypes[control] == "arrowsClick" || controlTypes[control] == "arrowsHover"){
-      // Here we want to get the current position of the triangle and add a delta of motion
-      // I considered making this delta inversely proportional to the distance to the goal. For example, 10px for far away, 5px increment when mid-range, 1px for when you are close (within 5px?)
-      var delta = 3;
-      if(direction == LEFT || direction == UP){
-        a = [-delta,-delta];
-      }
-      else{
-      a = [delta,delta];
-      }
-    }
+
     if(direction == undefined) {
         pos = [startPos[0] + a[0], startPos[1] + a[1]];
     }
@@ -598,7 +545,7 @@ function drag(evt, direction) {
         console.error("Bad direction");
     }
 
-    console.log("moved");
+    console.log("dragged");
     resetPose();
 }
 
@@ -615,35 +562,34 @@ function checkGoal(currPoseX, currPoseY, goalPoseX, goalPoseY, currRot, goalRot)
 
 function rotate(evt, direction) {
     var newPoint = [0,0];
-    var delta = 3;
+    var delta = 1.75;
+    var alpha = 0.0;
     if(direction == undefined){
+      // This was the original rotate method with the undefined direction part
       var ws = document.getElementById("workspace");
       var rect = ws.getBoundingClientRect();
       var mouseX = evt.clientX - rect.left;
       var mouseY = evt.clientY - rect.top;
       newPoint = [mouseX, mouseY];
+      var centerPoint = pos;
+      var a = diff(newPoint, refPos);
+      var aUnit = [a[0]/length(a),a[1]/length(a)];
+      var b = diff(newPoint, centerPoint);
+      var c = diff(refPos, centerPoint);
+      var cUnitOrth = [c[1]/length(c), -c[0]/length(c)];
+      var alphaSign = -Math.sign(dot(cUnitOrth, b));
+      var dist = dot(aUnit,b);
+      var alpha1 = Math.asin(dist/length(b));
+      var alpha2 = Math.asin((length(a)-dist)/length(c));
+      alpha = alphaSign*(alpha1+alpha2);
+      var alphaDeg = Math.round(180.0*alpha/Math.PI);
     }
     else if(direction == CW){
-      newPoint = [pos[0] + 2*delta, pos[1] - delta];
-      refPos = [pos[0] + 1, pos[1] - 1];
+      alphaDeg = 1;
     }
     else if(direction == CCW){
-      newPoint = [pos[0] + 2*delta, pos[1] + delta];
-      refPos = [pos[0] + 1, pos[1] + 1];
+      alphaDeg = -1;
     }
-    // This was the original rotate method with the undefined direction part
-    var centerPoint = pos;
-    var a = diff(newPoint, refPos);
-    var aUnit = [a[0]/length(a),a[1]/length(a)];
-    var b = diff(newPoint, centerPoint);
-    var c = diff(refPos, centerPoint);
-    var cUnitOrth = [c[1]/length(c), -c[0]/length(c)];
-    var alphaSign = -Math.sign(dot(cUnitOrth, b));
-    var dist = dot(aUnit,b);
-    var alpha1 = Math.asin(dist/length(b));
-    var alpha2 = Math.asin((length(a)-dist)/length(c));
-    var alpha = alphaSign*(alpha1+alpha2);
-    var alphaDeg = Math.round(180.0*alpha/Math.PI);
     if (!isNaN(alpha)) {
         rot = startRot + alphaDeg;
 
@@ -676,31 +622,11 @@ function stopDrag(evt, direction) {
     if (isTranslating) {
         var ws = document.getElementById("workspace");
         ws.removeAttributeNS(null, "onmousemove");
-
-        if (direction == undefined) {
-            if (isOneTouch) {
-                ee.setAttributeNS(null, "onclick", "startDrag(evt)");
-            }
-            else {
-                ws.removeAttributeNS(null, "onmouseup");
-            }
-        } else {
-
-            if (isOneTouch) {
-                arrowRight.setAttributeNS(null, "onclick", "startDrag(evt, RIGHT)");
-                arrowLeft.setAttributeNS(null, "onclick", "startDrag(evt, LEFT)");
-                arrowUp.setAttributeNS(null, "onclick", "startDrag(evt, UP)");
-                arrowDown.setAttributeNS(null, "onclick", "startDrag(evt, DOWN)");
-            }
-            else {
-                ws.removeAttributeNS(null, "onmouseup");
-            }
-            arrowRight.style.fill = "#181acc";
-            arrowLeft.style.fill = "#181acc";
-            arrowUp.style.fill = "#cc070e";
-            arrowDown.style.fill = "#cc070e";
-        }
-
+        ws.removeAttributeNS(null, "onmouseup");
+        arrowRight.style.fill = "#181acc";
+        arrowLeft.style.fill = "#181acc";
+        arrowUp.style.fill = "#cc070e";
+        arrowDown.style.fill = "#cc070e";
         if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
             success(); }
         ee.style.fill = "#ACC";
@@ -712,15 +638,8 @@ function stopRotate(evt, direction) {
     if (isRotating) {
         var ws = document.getElementById("workspace");
         ws.removeAttributeNS(null, "onmousemove");
-        if (isOneTouch) {
-            ring.setAttributeNS(null, "onclick", "startRotate(evt)");
-            ws.removeAttributeNS(null, "onclick");
-        }
-        else
-            ws.removeAttributeNS(null, "onmouseup");
+        ws.removeAttributeNS(null, "onmouseup");
         isRotating = false;
-        arrowCW.style.fill = "#a442f4";
-        arrowCCW.style.fill = "#36bc3d";
         ring.style.stroke = "#AAC";
         if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
             success();
@@ -731,13 +650,19 @@ function stopRotate(evt, direction) {
 function stopRotate2(evt, direction) {
     if (isRotating) {
         var ws = document.getElementById("workspace");
-        ws.removeAttributeNS(null, "onmousedown");
-        ws.removeAttributeNS(null, "onmouseup");
+        if(controlTypes[control] == "arrowsClick"){
+            ws.removeAttributeNS(null, "onmousedown");
+            ws.removeAttributeNS(null, "onmouseup");
+        }
+        if(controlTypes[control] == "arrowsHover"){
+            ws.removeAttributeNS(null, "onmouseover");
+            ws.removeAttributeNS(null, "onmouseout");
+        }
         isRotating = false;
         arrowCW.style.fill = "#a442f4";
         arrowCCW.style.fill = "#36bc3d";
         if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
-          success();
+            success();
         }
     }
 }
@@ -755,6 +680,8 @@ function clearWorkspace() {
     ws.removeAttribute("onclick");
     ws.removeAttribute("onmousedown");
     ws.removeAttribute("onmouseup");
+    ws.removeAttribute("onmouseover");
+    ws.removeAttribute("onmouseout");
 }
 
 function moveObject(object, x, y, theta) {
