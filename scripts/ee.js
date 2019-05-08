@@ -607,8 +607,8 @@ function startRotate2(evt, direction) {
         }, 50);
         evt.target.addEventListener("mouseout", function() {
             hover = false;
-            arrowCW.style.fill = "black";
-            arrowCCW.style.fill = "black";
+            circleCW.style.fill = "black";
+            circleCCW.style.fill = "black";
             if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
             success();
             }
@@ -824,6 +824,7 @@ function clearWorkspace() {
     ws.removeAttribute("onmouseup");
     ws.removeAttribute("onmouseover");
     ws.removeAttribute("onmouseout");
+    sixArrows = null;
 }
 
 function moveObject(object, x, y, theta) {
