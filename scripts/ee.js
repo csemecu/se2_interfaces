@@ -48,7 +48,7 @@ var arrowUpYOffset;
 var arrowDownXOffset;
 var arrowDownYOffset;
 
-// Additional variables used by arrowClick and arrowOver
+// Additional variables used by arrowClick and arrowHover
 var arrowCW;
 var arrowCCW;
 var arrowCWXOffset;
@@ -56,6 +56,13 @@ var arrowCWYOffset;
 var arrowCCWXOffset;
 var arrowCCWYOffset;
 var arrowsSix;
+var circleRight;
+var circleLeft;
+var circleUp;
+var circleDown;
+var circleCW;
+var circleCCW;
+
 
 // Constant variables for the arrows
 const RIGHT = 0;
@@ -135,21 +142,21 @@ function createEE() {
     }
     else if (controlTypes[control] === "arrowsClick") {
         createSixArrows();
-        arrowRight.setAttribute("onmousedown", "startDrag(evt, RIGHT)");
-        arrowLeft.setAttribute("onmousedown", "startDrag(evt, LEFT)");
-        arrowUp.setAttribute("onmousedown", "startDrag(evt, UP)");
-        arrowDown.setAttribute("onmousedown", "startDrag(evt, DOWN)");
-        arrowCW.setAttribute("onmousedown", "startRotate2(evt,CW)");
-        arrowCCW.setAttribute("onmousedown", "startRotate2(evt,CCW)");
+        circleRight.setAttribute("onmousedown", "startDrag(evt, RIGHT)");
+        circleLeft.setAttribute("onmousedown", "startDrag(evt, LEFT)");
+        circleUp.setAttribute("onmousedown", "startDrag(evt, UP)");
+        circleDown.setAttribute("onmousedown", "startDrag(evt, DOWN)");
+        circleCW.setAttribute("onmousedown", "startRotate2(evt,CW)");
+        circleCCW.setAttribute("onmousedown", "startRotate2(evt,CCW)");
     }
     else if (controlTypes[control] === "arrowsHover") {
         createSixArrows();
-        arrowRight.setAttribute("onmouseover", "startDrag(evt, RIGHT)");
-        arrowLeft.setAttribute("onmouseover", "startDrag(evt, LEFT)");
-        arrowUp.setAttribute("onmouseover", "startDrag(evt, UP)");
-        arrowDown.setAttribute("onmouseover", "startDrag(evt, DOWN)");
-        arrowCW.setAttribute("onmouseover", "startRotate2(evt,CW)");
-        arrowCCW.setAttribute("onmouseover", "startRotate2(evt,CCW)");
+        circleRight.setAttribute("onmouseover", "startDrag(evt, RIGHT)");
+        circleLeft.setAttribute("onmouseover", "startDrag(evt, LEFT)");
+        circleUp.setAttribute("onmouseover", "startDrag(evt, UP)");
+        circleDown.setAttribute("onmouseover", "startDrag(evt, DOWN)");
+        circleCW.setAttribute("onmouseover", "startRotate2(evt,CW)");
+        circleCCW.setAttribute("onmouseover", "startRotate2(evt,CCW)");
     }
     else {
         console.error("Please select a valid control");
@@ -282,7 +289,9 @@ function createArrows() {
 }
 
 function createSixArrows() {
-    var ws = document.getElementById("workspace");
+    var ws = document.getElementById("controlPanel");
+    var center = [135,135];
+    var fittsDist = 55;
 
     arrowRight = document.createElementNS('http://www.w3.org/2000/svg','path');
     arrowLeft = document.createElementNS('http://www.w3.org/2000/svg','path');
@@ -304,20 +313,56 @@ function createSixArrows() {
     arrowUp.style.fill = "#cc070e";
     arrowDown.style.fill = "#cc070e";
     arrowCW.style.fill = "#a442f4"; // when clicked = #bf42f4
-    arrowCCW.style.fill = "#36bc3d";// for now when clicked = #4cef23
+    arrowCCW.style.fill = "#a442f4";
+    //arrowCCW.style.fill = "#36bc3d";// for now when clicked = #4cef23
 
-    arrowRightXOffset = innerR + ringWidth;
-    arrowRightYOffset = - arrowWidth / 2;
-    arrowLeftXOffset = - (innerR + ringWidth);
-    arrowLeftYOffset =  arrowWidth / 2;
-    arrowUpXOffset = - arrowWidth / 2;
-    arrowUpYOffset =  - (innerR + ringWidth);
-    arrowDownXOffset = arrowWidth / 2;
-    arrowDownYOffset = (innerR + ringWidth);
-    arrowCWXOffset = Math.round((innerR + ringWidth - arrowWidth / 2)*0.707) + arrowWidth /2;
-    arrowCWYOffset = - Math.round((innerR + ringWidth + arrowWidth / 2)*0.707) - arrowWidth;
-    arrowCCWXOffset = - Math.round((innerR + ringWidth + arrowWidth / 2)*0.707) + arrowWidth /2;
-    arrowCCWYOffset = - Math.round((innerR + ringWidth - arrowWidth / 2)*0.707) - arrowWidth;
+    arrowRightXOffset = fittsDist - arrowLengthTot/2;
+    arrowRightYOffset = - arrowWidth/2;
+    arrowLeftXOffset = - fittsDist + arrowLengthTot/2;
+    arrowLeftYOffset =  arrowWidth/2;
+    arrowUpXOffset = - arrowWidth/2;
+    arrowUpYOffset = - fittsDist + arrowLengthTot/2;
+    arrowDownXOffset = arrowWidth/2;
+    arrowDownYOffset = fittsDist - arrowLengthTot/2;
+    arrowCWXOffset = Math.round(1.5*fittsDist - arrowWidth*0.707/2);
+    arrowCWYOffset = - Math.round(1.5*fittsDist) - arrowWidth;
+    arrowCCWXOffset = - Math.round(1.5*fittsDist - arrowWidth);
+    arrowCCWYOffset = - Math.round(1.5*fittsDist) - arrowWidth/2;
+
+    // parameters: (object, x, y, theta, scale)
+
+    circleRight = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circleRight.setAttribute("r","35");
+    circleRight.setAttribute("fill","yellow");
+    circleLeft = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circleLeft.setAttribute("r","35");
+    circleLeft.setAttribute("fill","yellow");
+    circleUp = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circleUp.setAttribute("r","35");
+    circleUp.setAttribute("fill","cyan");
+    circleDown = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circleDown.setAttribute("r","35");
+    circleDown.setAttribute("fill","cyan");
+    circleCW = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circleCW.setAttribute("r","35");
+    circleCW.setAttribute("fill","black");
+    circleCCW = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circleCCW.setAttribute("r","35");
+    circleCCW.setAttribute("fill","black");
+
+    moveObjectAndScale(circleRight, center[0] + fittsDist , center[1] , 0, scale);
+    moveObjectAndScale(circleLeft, center[0] - fittsDist , center[1] , 0, scale);
+    moveObjectAndScale(circleUp, center[0] , center[1] - fittsDist , 0, scale);
+    moveObjectAndScale(circleDown, center[0] , center[1] + fittsDist , 0, scale);
+    moveObjectAndScale(circleCW, center[0] + 1.5*fittsDist , center[1] - 1.5*fittsDist , 0, scale);
+    moveObjectAndScale(circleCCW, center[0] - 1.5*fittsDist , center[1] - 1.5*fittsDist , 0, scale);
+
+    ws.appendChild(circleRight);
+    ws.appendChild(circleLeft);
+    ws.appendChild(circleUp);
+    ws.appendChild(circleDown);
+    ws.appendChild(circleCW);
+    ws.appendChild(circleCCW);
 
     arrowsSix.forEach(function(arrow) {
         ws.appendChild(arrow);
@@ -404,7 +449,8 @@ function resetPose() {
         moveObjectAndScale(arrowDown, pos[0] + arrowDownXOffset, pos[1] + arrowDownYOffset, 90, scale);
     }
     if(arrowsSix){
-      var center = [105,105];  // TO-DO this should be placed in a different element, not inside "workspace"
+      var center = [135,135];  // TO-DO this should be placed in a different element, not inside "workspace"
+      // parameters: (object, x, y, theta, scale)
       moveObjectAndScale(arrowRight, center[0] + arrowRightXOffset, center[1] + arrowRightYOffset, 0, scale);
       moveObjectAndScale(arrowLeft, center[0] + arrowLeftXOffset, center[1] + arrowLeftYOffset, 180, scale);
       moveObjectAndScale(arrowUp, center[0] + arrowUpXOffset, center[1] + arrowUpYOffset, -90, scale);
@@ -446,13 +492,51 @@ function startDrag(evt, direction) {
             ws.setAttributeNS(null, "onmouseup", "stopDrag(evt, " + direction + ")");
         }
         if(controlTypes[control] == "arrowsClick"){
-            console.log("curiosity, ",evt);
-            ws.setAttributeNS(null, "onmousedown", "move2(evt, " + direction + ")");
-            ws.setAttributeNS(null, "onmouseup", "stopDrag(evt, " + direction + ")");
+            ws.setAttributeNS(null,"onmousedown","move2(" + direction + ")");
+            //ws.setAttributeNS(null, "onmousedown", "move2(evt, " + direction + ")");
+            //ws.setAttributeNS(null, "onmouseup", "stopDrag(evt, " + direction + ")");
+            let clicked = true;
+            const move = window.setInterval(function() {
+                if(clicked) {
+                    //console.log("pos = " + pos);
+                    move2(direction);
+                    startPos = pos;
+                }
+            }, 50);
+            evt.target.addEventListener("mouseup", function() {
+                clicked = false;
+                circleRight.style.fill = "yellow";
+                circleLeft.style.fill = "yellow";
+                circleUp.style.fill = "cyan";
+                circleDown.style.fill = "cyan";
+                if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
+                    success(); }
+                ee.style.fill = "#ACC";
+            });
+            evt.stopPropagation();
         }
         if(controlTypes[control] == "arrowsHover"){
-            ws.setAttributeNS(null, "onmouseover", "move2(evt, " + direction + ")");
-            ws.setAttributeNS(null, "onmouseout", "stopDrag(evt, " + direction + ")");
+            ws.setAttributeNS(null,"onmouseover","move2(" + direction + ")");
+            //ws.setAttributeNS(null, "onmouseover", "move2(evt, " + direction + ")");
+            //ws.setAttributeNS(null, "onmouseout", "stopDrag(evt, " + direction + ")");
+            let hover = true;
+            const move = window.setInterval(function() {
+                if(hover) {
+                    //console.log("pos = " + pos);
+                    move2(direction);
+                    startPos = pos;
+                }
+            }, 50);
+            evt.target.addEventListener("mouseout", function() {
+                hover = false;
+                circleRight.style.fill = "yellow";
+                circleLeft.style.fill = "yellow";
+                circleUp.style.fill = "cyan";
+                circleDown.style.fill = "cyan";
+                if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
+                    success(); }
+                ee.style.fill = "#ACC";
+            });
             evt.stopPropagation();
         }
         if(direction == LEFT || direction == RIGHT){
@@ -486,23 +570,61 @@ function startRotate2(evt, direction) {
     startRot = rot;
     var ws = document.getElementById("workspace");
     if(controlTypes[control] == "arrowsClick"){
-        ws.setAttributeNS(null, "onmousedown", "rotate(evt, " + direction + ")");
-        ws.setAttributeNS(null, "onmouseup", "stopRotate2(evt, " + direction + ")");
+        ws.setAttributeNS(null,"onmousedown","rotate2(" + direction + ")");
+        //ws.setAttributeNS(null, "onmousedown", "rotate(evt, " + direction + ")");
+        //ws.setAttributeNS(null, "onmouseup", "stopRotate2(evt, " + direction + ")");
+        let clicked = true;
+        const move = window.setInterval(function() {
+            if(clicked) {
+                //console.log("pos = " + pos);
+                rotate2(direction);
+                startPos = pos;
+                startRot = rot;
+            }
+        }, 50);
+        evt.target.addEventListener("mouseup", function() {
+            clicked = false;
+            circleCW.style.fill = "black";
+            circleCCW.style.fill = "black";
+            if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
+            success();
+            }
+        });
+        evt.stopPropagation();
     }
     if(controlTypes[control] == "arrowsHover"){
-        ws.setAttributeNS(null, "onmouseover", "rotate(evt, " + direction + ")");
-        ws.setAttributeNS(null, "onmouseout", "stopRotate2(evt, " + direction + ")");
+        ws.setAttributeNS(null,"onmouseover","rotate2(" + direction + ")");
+        //ws.setAttributeNS(null, "onmouseover", "rotate(evt, " + direction + ")");
+        //ws.setAttributeNS(null, "onmouseout", "stopRotate2(evt, " + direction + ")");
+        let hover = true;
+        const move = window.setInterval(function() {
+            if(hover) {
+                //console.log("pos = " + pos);
+                rotate2(direction);
+                startPos = pos;
+                startRot = rot;
+            }
+        }, 50);
+        evt.target.addEventListener("mouseout", function() {
+            hover = false;
+            arrowCW.style.fill = "black";
+            arrowCCW.style.fill = "black";
+            if(checkGoal(pos[0], pos[1], targetPos[0], targetPos[1], rot, targetRot)){
+            success();
+            }
+        });
+        evt.stopPropagation();
     }
     if(direction == CW){
         evt.target.style.fill = "#bf42f4"
     }
     else if(direction == CCW){
-        evt.target.style.fill = "#4cef23"
+        evt.target.style.fill = "#bf42f4"
     }
     //ws.setAttributeNS(null, "onmouseup", "stopRotate2(evt)");
 }
 
-function move2(evt, direction){
+function move2(direction){
     var ws = document.getElementById("workspace");
     var a = 0;
     var delta = 1;
@@ -559,6 +681,26 @@ function checkGoal(currPoseX, currPoseY, goalPoseX, goalPoseY, currRot, goalRot)
 
 
 }
+
+function rotate2(direction){
+    var alphaDeg = 0;
+    if(direction == CW){
+
+        alphaDeg = 1;
+    }
+    else if(direction == CCW){
+        alphaDeg = -1;
+    }
+    rot = startRot + alphaDeg;
+
+        if (rot > 180)
+            rot -= 360;
+        if (rot < -180)
+            rot += 360;
+        console.log("rotated, ", rot);
+        resetPose();
+}
+
 
 function rotate(evt, direction) {
     var newPoint = [0,0];
